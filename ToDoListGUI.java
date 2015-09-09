@@ -8,6 +8,7 @@ import javafx.application.*;
 import javafx.scene.control.*;
 import javafx.scene.*;
 import javafx.scene.layout.*;
+import javafx.scene.text.Text;
 import javafx.stage.*;
 import javafx.event.*;
 import javafx.geometry.*;
@@ -18,28 +19,40 @@ public class ToDoListGUI extends Application
     private static final double WIDTH = 400;
     private static final double HEIGHT = 800;
 
-    private ToDoList list;
+    private ToDoList list = new ToDoList();
 
     @Override
     public void start(Stage primaryStage)
     {
-        // the pane and the buttons
+        // the pane
         GridPane pane = new GridPane();
         pane.setAlignment(Pos.BOTTOM_CENTER);
-        VBox vbox = new VBox(10);
-        vbox.setAlignment(Pos.CENTER);
-        vbox.setPadding(new Insets(50));
+
+        // the text of the list
+        VBox listBox = new VBox(10);
+        listBox.setAlignment(Pos.CENTER);
+        listBox.setPadding(new Insets(50));
+//        Text listText = new Text("List text placeholder");
+        TextArea listArea = new TextArea("List area placeholder");
+        listArea.setEditable(false);
+        listBox.getChildren().add(listArea);
+
+        // the buttons
+        VBox buttonBox = new VBox(10);
+        buttonBox.setAlignment(Pos.BOTTOM_CENTER);
+        buttonBox.setPadding(new Insets(50));
         Button addButton = new Button("Add");
         Button deleteButton = new Button("Delete");
+        listBox.getChildren().addAll(addButton, deleteButton);
 
 //        // make the add button the default button when ENTER is pressed
 //        addButton.setDefaultButton(true);
 
-        addButton.setOnAction(new NavHandler());
+        addButton.setOnAction(new AddHandler());
 
-        vbox.getChildren().add(addButton);
-        vbox.getChildren().add(deleteButton);
-        pane.add(vbox, 5, 5);
+        pane.add(listBox, 0, 0);
+        //pane.add(buttonBox, 5, 5);
+
         //pane.add(addButton, 200, 200);
         //pane.add(deleteButton, 200, 600);
 
@@ -50,27 +63,24 @@ public class ToDoListGUI extends Application
         primaryStage.show();
     }
 
-    /* Inner class to handle navigation buttons */
-    class NavHandler implements EventHandler<ActionEvent>
+    /* Inner class to handle "Add" button */
+    class AddHandler implements EventHandler<ActionEvent>
     {
-        /* Handles button pressing */
+        /* Handles adding item when pressing "Add" button */
         @Override
         public void handle(ActionEvent e)
         {
             System.out.println("test");
-/*
-            // "Add" button pressed
-            if ()
-            {
-
-            }
-            // "Delete" button pressed
-            else ()
-            {
-
-            }
-*/
+            list.addItem("First item");
+            list.addItem("cat item", "Cat 1");
+            System.out.println(list.buildList());
         }
+    }
+
+    /* Displays the list contents in GUI */
+    private void updateListText(Text listText, String listString)
+    {
+        listText.setText(listString);
     }
 
 //    public static void main(String[] args)
@@ -78,5 +88,3 @@ public class ToDoListGUI extends Application
 //        Application.launch(args);
 //    }
 }
-
-

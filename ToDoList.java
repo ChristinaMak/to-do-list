@@ -13,6 +13,9 @@ public class ToDoList
     private ArrayList<String> categoryNames;
     private ArrayList<ArrayList<String>> categoryList;
 
+    private String listFull;
+    private String listCurrCategory;
+
     /** Constructor for to-do list */
     public ToDoList()
     {
@@ -114,6 +117,94 @@ public class ToDoList
                 viewList(string);
             }
         }
+    }
+
+    /** Builds the list as a string
+     */
+    public String buildList()
+    {
+        StringBuilder outputString = new StringBuilder();
+
+        //don't display heading if no categories created
+        if(categoryNames.size() == 1)
+        {
+            for(String string: list)
+            {
+                //System.out.println(string);
+                outputString.append(string + "\n");
+            }
+        }
+        //otherwise display all categories
+        else
+        {
+            for(String string : categoryNames)
+            {
+                //viewList(string);
+                outputString.append(buildList(string));
+            }
+        }
+
+        // save the list
+        listFull = outputString.toString();
+
+        return listFull;
+
+        //return listFull = outputString.toString();  TODO allowed?
+    }
+
+    /** Builds a specified categories of the list
+     *  @param categories the categories to include in list
+     *  @return the list as a string
+     */
+    public String buildList(String... categories)
+    {
+        StringBuilder outputString = new StringBuilder();
+
+        for(int i = 0; i < categories.length; i++)
+        {
+            //convert category to uppercase and trim
+            categories[i] = categories[i].toUpperCase().trim();
+
+            //check that category exists
+            if(categoryNames.contains(categories[i]))
+            {
+                // append heading
+                //System.out.println("----" + categories[i] + "----");
+                outputString.append("----" + categories[i] + "----\n");
+
+                //find index of category
+                int index = categoryNames.indexOf(categories[i]);
+
+                //print each item in category
+                ArrayList<String> currList = categoryList.get(index);
+                for(String item: currList)
+                {
+                    //System.out.println("- " + item);
+                    outputString.append("- " + item + "\n");
+                }
+            }
+            else
+            {
+                System.out.println("Category '" + categories[i] + "' does not exist.");
+            }
+        }
+
+        // save the list
+        listCurrCategory = outputString.toString();
+
+        return listCurrCategory;
+    }
+
+    /** Returns the full list */
+    public String getListFull()
+    {
+        return listFull;
+    }
+
+    /** Returns the list of the last requested categories */
+    public String getListCurrCategory()
+    {
+        return listCurrCategory;
     }
 
     /** Display specified categories of lists
