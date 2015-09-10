@@ -22,8 +22,14 @@ public class ToDoListGUI extends Application
     private static final double VERT_SP = 10;
     private static final double BTN_BOX_SP = 5;
     private static final double BTN_WIDTH = 57;
+    private static final double CAT_FIELD_W = 90;
 
     private ToDoList list = new ToDoList();
+    private TextArea listArea;
+    private TextField addField;
+    private TextField catAddField;
+    private TextField deleteField;
+    private TextField catDeleteField;
 
     @Override
     public void start(Stage primaryStage)
@@ -31,31 +37,41 @@ public class ToDoListGUI extends Application
         // the pane
         GridPane pane = new GridPane();
         pane.setAlignment(Pos.CENTER);
-        
+
         // the text of the list
         VBox listBox = new VBox(VERT_SP);
         listBox.setAlignment(Pos.CENTER);
         listBox.setPadding(new Insets(INSET_SIZE));
-        TextArea listArea = new TextArea("List area placeholder");
+        listArea = new TextArea("List area placeholder");
+
         listArea.setEditable(false);
         listBox.getChildren().add(listArea);
 
+        // labels for text fields
+        HBox labelBox = new HBox(47);
+        Label catLabel = new Label("Category");
+        Label itemLabel = new Label("Item");
+        labelBox.getChildren().addAll(catLabel, itemLabel);
+        listBox.getChildren().add(labelBox);
+
         // the hbox for add field and button
         Button addButton = new Button("Add");
-        TextField addField = new TextField(); // field to let user add item to list
+        addField = new TextField(); // field to let user add item to list
+        catAddField = new TextField();
         HBox addBox = new HBox(BTN_BOX_SP);
-        initBtnBox(addBox, addField, addButton, listBox);
+        initBtnBox(addBox, addField, catAddField, addButton, listBox);
 
-        // the hbox for delete button
+        // the hbox for delete field and button
         Button deleteButton = new Button("Delete");
-        TextField deleteField = new TextField();  // field to let user delete item from list
+        deleteField = new TextField();  // field to let user delete item from list
+        catDeleteField = new TextField();
         HBox deleteBox = new HBox(BTN_BOX_SP);
-        initBtnBox(deleteBox, deleteField, deleteButton, listBox);
+        initBtnBox(deleteBox, deleteField, catDeleteField, deleteButton, listBox);
 
-//        // make the add button the default button when ENTER is pressed
-//        addButton.setDefaultButton(true);
-
+        // handle request to add to list
         addButton.setOnAction(new AddHandler());
+        addField.setOnAction(new AddHandler());
+        catAddField.setOnAction(new AddHandler());
 
         pane.add(listBox, 0, 0);
 
@@ -73,26 +89,43 @@ public class ToDoListGUI extends Application
         @Override
         public void handle(ActionEvent e)
         {
-            System.out.println("test");
-            list.addItem("First item");
-            list.addItem("cat item", "Cat 1");
-            System.out.println(list.buildList());
+            String category = catAddField.getCharacters().toString();
+            String newItem = addField.getCharacters().toString();
+            //System.out.println("test");
+
+            // a category and item specified
+            if (!(category.equals("")) && !(newItem.equals("")))
+            {
+                list.addItem(newItem, category);
+            }
+            // an item but no category specified
+            else if (category.equals("") && !(newItem.equals("")))
+            {
+                System.out.println("here");
+                list.addItem(newItem, "UNCATEGORIZED"); //TODO
+            }
+
+            //System.out.println(list.buildList());
+            String listString = list.buildList();
+            updateListArea(listArea, listString);
+            System.out.println(listString);
         }
     }
 
     /* Displays the list contents in GUI */
-    private void updateListText(Text listText, String listString)
+    private void updateListArea(TextArea listArea, String listString)
     {
-        listText.setText(listString);
+        listArea.setText(listString);
     }
 
-    private void initBtnBox(HBox hbox, TextField field, Button button, VBox vbox)
+    private void initBtnBox(HBox hbox, TextField field, TextField catField, Button button, VBox vbox)
     {
         button.setMinWidth(BTN_WIDTH);
         hbox.setAlignment(Pos.CENTER_RIGHT);
-        hbox.getChildren().addAll(field, button);
+        hbox.getChildren().addAll(catField, field, button);
         //hbox.setMinWidth(vbox.getWidth() - BTN_BOX_SP - BTN_WIDTH);
-        field.setMinWidth(300); //TODO tune width
+        catField.setMaxWidth(CAT_FIELD_W);
+        //field.setMinWidth(300); //TODO tune width, resizing window
         vbox.getChildren().add(hbox);
     }
 
