@@ -9,7 +9,7 @@ import java.util.*;
 /** Class for a to-do list */
 public class ToDoList
 {
-    private ArrayList<String> list;  //default list, uncategorized
+    //private ArrayList<String> list;  //default list, uncategorized
     private ArrayList<String> categoryNames;
     private ArrayList<ArrayList<String>> categoryList;
 
@@ -19,12 +19,13 @@ public class ToDoList
     /** Constructor for to-do list */
     public ToDoList()
     {
-        list = new ArrayList<String>();
+        //list = new ArrayList<String>();
         categoryNames = new ArrayList<String>();
         categoryList = new ArrayList<ArrayList<String>>();
 
-        categoryNames.add("UNCATEGORIZED");
-        categoryList.add(list);
+        // TODO initialize default uncategorized list
+        //categoryNames.add("UNCATEGORIZED");
+        //categoryList.add(list);
     }
 
     /** Adds an item to the list
@@ -33,7 +34,8 @@ public class ToDoList
      */
     public boolean addItem(String item)
     {
-        return list.add(item);
+        //return list.add(item);
+        return addItem(item, "UNCATEGORIZED");
     }
 
     /** Add method to add item to categories
@@ -99,6 +101,7 @@ public class ToDoList
     }
 
     /** Displays the list */
+    /*
     public void viewList()
     {
         //don't display heading if no categories created
@@ -118,7 +121,7 @@ public class ToDoList
             }
         }
     }
-
+    */
     /** Builds the list as a string
      */
     public String buildList()
@@ -126,6 +129,7 @@ public class ToDoList
         StringBuilder outputString = new StringBuilder();
 
         //don't display heading if no categories created
+        /*
         if(categoryNames.size() == 1)
         {
             for(String string: list)
@@ -136,13 +140,13 @@ public class ToDoList
         }
         //otherwise display all categories
         else
-        {
+        {*/
             for(String string : categoryNames)
             {
                 //viewList(string);
                 outputString.append(buildList(string));
             }
-        }
+        //}
 
         // save the list
         listFull = outputString.toString();
@@ -182,11 +186,15 @@ public class ToDoList
                     //System.out.println("- " + item);
                     outputString.append("- " + item + "\n");
                 }
+
+                // line break between categories
+                outputString.append("\n");
             }
             else
             {
                 System.out.println("Category '" + categories[i] + "' does not exist.");
             }
+
         }
 
         // save the list
