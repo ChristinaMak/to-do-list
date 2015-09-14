@@ -21,7 +21,7 @@ public class ToDoListGUI extends Application
     private static final double INSET_SIZE = 50;
     private static final double VERT_SP = 10;
     private static final double BTN_BOX_SP = 5;
-    private static final double BTN_WIDTH = 57;
+    private static final double BTN_WIDTH = 61;
     private static final double CAT_FIELD_W = 90;
 
     private ToDoList list = new ToDoList();
@@ -29,7 +29,8 @@ public class ToDoListGUI extends Application
     private TextField addField;
     private TextField catAddField;
     private TextField deleteField;
-    private TextField catDeleteField;
+    private TextField oldField;
+    private TextField newField;
 
     @Override
     public void start(Stage primaryStage)
@@ -59,19 +60,28 @@ public class ToDoListGUI extends Application
         addField = new TextField(); // field to let user add item to list
         catAddField = new TextField();
         HBox addBox = new HBox(BTN_BOX_SP);
-        initBtnBox(addBox, addField, catAddField, addButton, listBox);
+        catAddField.setMaxWidth(CAT_FIELD_W);
+        initBtnBox(addBox, addButton, listBox, catAddField, addField);
 
         // the hbox for delete field and button
         Button deleteButton = new Button("Delete");
         deleteField = new TextField();  // field to let user delete item from list
-        catDeleteField = new TextField();
         HBox deleteBox = new HBox(BTN_BOX_SP);
-        initBtnBox(deleteBox, deleteField, catDeleteField, deleteButton, listBox);
+        deleteField.setMinWidth(250);  //TODO bindings
+        //System.out.println(listArea.getWidth());
+        initBtnBox(deleteBox, deleteButton, listBox, deleteField);
 
-        // handle request to add to list
-        addButton.setOnAction(new AddHandler());
-        addField.setOnAction(new AddHandler());
-        catAddField.setOnAction(new AddHandler());
+        // the hbox for the update fields and button
+        Button updateButton = new Button("Update");
+        oldField = new TextField();
+        newField = new TextField();
+        HBox updateBox = new HBox(BTN_BOX_SP);
+        initBtnBox(updateBox, updateButton, listBox, oldField, newField);
+
+        // handle requests to modify list
+        setHandlers(addButton, new AddHandler(), addField, catAddField);
+        setHandlers(deleteButton, new DeleteHandler(), deleteField);
+        setHandlers(updateButton, new UpdateHandler(), newField, oldField);
 
         pane.add(listBox, 0, 0);
 
@@ -82,16 +92,16 @@ public class ToDoListGUI extends Application
         primaryStage.show();
     }
 
-    /* Inner class to handle "Add" button */
+    /** Inner class to handle "Add" button */
     class AddHandler implements EventHandler<ActionEvent>
     {
         /* Handles adding item when pressing "Add" button */
         @Override
         public void handle(ActionEvent e)
         {
+            // get user input in fields
             String category = catAddField.getCharacters().toString();
             String newItem = addField.getCharacters().toString();
-            //System.out.println("test");
 
             // a category and item specified
             if (!(category.equals("")) && !(newItem.equals("")))
@@ -105,28 +115,81 @@ public class ToDoListGUI extends Application
                 list.addItem(newItem, "UNCATEGORIZED"); //TODO
             }
 
-            //System.out.println(list.buildList());
-            String listString = list.buildList();
-            updateListArea(listArea, listString);
-            System.out.println(listString);
+            updateListArea();
+        }
+    }
+
+    /** Inner class to handle "Delete" button */
+    class DeleteHandler implements EventHandler<ActionEvent>
+    {
+        @Override
+        public void handle(ActionEvent e)
+        {
+            String toDelete = deleteField.getCharacters().toString();
+
+            list.deleteItem(toDelete);
+
+            updateListArea();
+        }
+    }
+
+    /** Inner class to handle "Update" button */
+    class UpdateHandler implements EventHandler<ActionEvent>
+    {
+        @Override
+        public void handle(ActionEvent e)
+        {
+            // get user inputs in fields
+            String oldItem = oldField.getCharacters().toString();
+            String newItem = newField.getCharacters().toString();
+
+            // update only if both fields are filled in
+            if (!oldItem.equals("") && !newItem.equals(""))
+            {
+                list.updateItem(oldItem, newItem);
+            }
+
+            updateListArea();
         }
     }
 
     /* Displays the list contents in GUI */
-    private void updateListArea(TextArea listArea, String listString)
+    private void updateListArea()
     {
+        // TODO phase out listString and build in this method directly
+        String listString = list.buildList();
         listArea.setText(listString);
+        System.out.println(listString);
     }
 
-    private void initBtnBox(HBox hbox, TextField field, TextField catField, Button button, VBox vbox)
+    /* Sets up the hbox with fields and a button. Adds to the vbox. */
+    private void initBtnBox(HBox hbox, Button button, VBox vbox, TextField... fields)
     {
+        // set alignments
         button.setMinWidth(BTN_WIDTH);
         hbox.setAlignment(Pos.CENTER_RIGHT);
-        hbox.getChildren().addAll(catField, field, button);
+
+        // add nodes
+
+        for (int i = 0; i < fields.length; i++)
+        {
+            hbox.getChildren().add(fields[i]);
+        }
+        hbox.getChildren().add(button);
+
         //hbox.setMinWidth(vbox.getWidth() - BTN_BOX_SP - BTN_WIDTH);
-        catField.setMaxWidth(CAT_FIELD_W);
         //field.setMinWidth(300); //TODO tune width, resizing window
         vbox.getChildren().add(hbox);
+    }
+
+    /* Registers the handlers for the buttons and the fields */
+    private void setHandlers(Button button, EventHandler<ActionEvent> handler, TextField... fields)
+    {
+        button.setOnAction(handler);
+        for (int i = 0; i < fields.length; i++)
+        {
+            fields[i].setOnAction(handler);
+        }
     }
 
 //    public static void main(String[] args)
